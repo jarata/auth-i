@@ -17,4 +17,16 @@ server.get('/', (req, res) => {
     res.send("Test");
 });
 
+server.post('/api/register', async (req, res) => {
+    res.send('Register POST')
+});
+
+server.post('/api/login', async (req, res) => {
+    res.send('Login POST')
+})
+
+server.get('/api/users', async (req, res) => {
+    res.send('Users GET')
+})
+
 module.exports = server;
