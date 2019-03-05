@@ -2,17 +2,32 @@ const express = require('express');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const cors = require('cors');
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcryptjs');
+const session = require('express-session');
 const knex = require('knex');
 const knexConfig = require('./knexfile');
 const db = knex(knexConfig.development);
 
 const server = express();
 
+// Cookie
+const cookieConfig = {
+    name: 'session',
+    secret: 'auth II',
+    cookie: {
+        maxAge: 60000,
+        secure: false
+    },
+    httpOnly: true,
+    resave: false,
+    saveUninitialized: false
+};
+
 server.use(express.json());
 server.use(helmet());
 server.use(morgan('dev'));
 server.use(cors());
+server.use(session(cookieConfig));
 
 server.get('/', (req, res) => {
     res.send("Test");
