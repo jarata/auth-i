@@ -15,7 +15,7 @@ const cookieConfig = {
     name: 'session',
     secret: 'auth II',
     cookie: {
-        maxAge: 60000,
+        maxAge: 120000,
         secure: false
     },
     httpOnly: true,
@@ -54,6 +54,7 @@ server.post('/api/login', async (req, res) => {
     try {
         let user = await db('users').where({username}).first();
         if (user && bcrypt.compareSync(password, user.password)) {
+            req.session.user = user;
             res.status(200).json({
                 message: 'Welcome'
             })
@@ -70,9 +71,19 @@ server.post('/api/login', async (req, res) => {
     }
 });
 
-server.get('/api/users', async (req, res) => {
+function restricted (req, res, next) {
+    if (req.session && req.session.user) {
+        next();
+    } else {
+        res.status(401).json({
+            error: "No logged in"
+        })
+    }
+}
+
+server.get('/api/users', restricted, async (req, res) => {
     try {
-        users = await db('users').select('id', 'username', 'password');
+        const users = await db('users').select('id', 'username', 'password');
         res.status(200).json(users)
     } catch (e) {
         console.log(e);
